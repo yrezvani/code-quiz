@@ -4,6 +4,7 @@ const choicesDiv = document.querySelector('#choices');
 const startBtn = document.querySelector('#start');
 const feedbackDiv = document.querySelector('#feedback');
 
+// create question objects
 const question1 = {
     number: 1,
     question: 'Commonly used data types DO NOT include:',
@@ -26,9 +27,11 @@ const question4 = {
     choices: ['commas', 'curly brackets', 'quotes', 'parentheses'],
 };
 
+// create array of question objects
 const questions = [question1, question2, question3, question4];
 
-const getQuestion = function (number) {
+// render questions
+const renderQuestion = function (number) {
     feedbackDiv.classList.add('hide');
     startScreen.classList.add('hide');
     questionsDiv.classList.remove('hide');
