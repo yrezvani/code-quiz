@@ -11,8 +11,10 @@ let timer;
 let totalTime = 75;
 
 const startQuiz = function () {
+    timeSpan.textContent = totalTime;
     timer = setInterval(function () {
-        timeSpan.textContent = totalTime--;
+        totalTime--;
+        timeSpan.textContent = totalTime;
         if (totalTime <= 0) {
             endQuiz();
         }
@@ -37,7 +39,6 @@ const actionAnswer = function (answer) {
         feedbackDiv.textContent = 'Wrong!';
         totalTime -= 15;
         timeSpan.textContent = totalTime;
-        console.log(totalTime);
     }
 };
 
@@ -60,26 +61,22 @@ const handleChoice = function (e) {
 };
 
 const endQuiz = function () {
+    clearInterval(timer);
     endScreen.classList.remove('hide');
     questionsDiv.classList.add('hide');
-    clearInterval(timer);
     finalScoreSpan.textContent = totalTime > 0 ? totalTime : '0';
     timeSpan.textContent = totalTime > 0 ? totalTime : '0';
-    if (totalTime <= 0) {
-        timeSpan.textContent = '0';
-        alert('Time is up.');
-    }
 };
 
 choicesDiv.addEventListener('click', handleChoice);
 
-// Record score to local storage
+// Record score and initials to local storage
 const handleSubmit = function (e) {
     const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
     const initials = document.querySelector('#initials').value.toUpperCase();
     const record = {
         initials: initials,
-        score: totalTime,
+        score: totalTime > 0 ? totalTime : '0',
     };
     highScores.push(record);
     localStorage.setItem('highScores', JSON.stringify(highScores));
