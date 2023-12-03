@@ -1,10 +1,11 @@
 const startScreen = document.querySelector('#start-screen');
 const timeSpan = document.querySelector('#time');
+const startBtn = document.querySelector('#start');
 const endScreen = document.querySelector('#end-screen');
 const finalScoreSpan = document.querySelector('#final-score');
 const initialsInput = document.querySelector('#initials');
 const submitBtn = document.querySelector('#submit');
-const answers = [3, 3, 4, 3];
+const answers = [3, 3, 4, 3, 4];
 let timer;
 
 let totalTime = 75;
@@ -12,9 +13,8 @@ let totalTime = 75;
 const startQuiz = function () {
     timer = setInterval(function () {
         timeSpan.textContent = totalTime--;
-        if (totalTime === 0) {
-            clearInterval(timer);
-            alert('You lost');
+        if (totalTime <= 0) {
+            endQuiz();
         }
     }, 1000);
 
@@ -23,6 +23,7 @@ const startQuiz = function () {
 
 startBtn.addEventListener('click', startQuiz);
 
+// Feedback for answer
 const actionAnswer = function (answer) {
     feedbackDiv.classList.remove('hide');
     const correctAudio = new Audio('assets/sfx/correct.wav');
@@ -31,52 +32,58 @@ const actionAnswer = function (answer) {
     if (answer === 'correct') {
         correctAudio.play();
         feedbackDiv.textContent = 'Correct!';
-    }
-    if (answer === 'incorrect') {
+    } else {
         incorrectAudio.play();
         feedbackDiv.textContent = 'Wrong!';
         totalTime -= 15;
         timeSpan.textContent = totalTime;
+        console.log(totalTime);
     }
 };
 
+// render next question after a choice has been chosen
 const handleChoice = function (e) {
     element = e.target;
-    if (element.classList.contains('choice')) {
+    if (element.matches('button')) {
         const questionNumber = parseInt(element.dataset.question);
         const chosenAnswer = parseInt(element.dataset.choice);
-        console.log(questionNumber);
-        if (questionNumber < 4) {
+        if (questionNumber < 5) {
             renderQuestion(questionNumber + 1);
-            console.log(questionNumber + 1);
         }
 
         if (chosenAnswer === answers[questionNumber - 1]) {
             actionAnswer('correct');
         } else actionAnswer('incorrect');
 
-        if (questionNumber === 4) {
-            clearInterval(timer);
-            finalScoreSpan.textContent = totalTime;
-            timeSpan.textContent = totalTime;
-            console.log(timer);
-            endScreen.classList.remove('hide');
-            questionsDiv.classList.add('hide');
-        }
+        if (questionNumber === 5) endQuiz();
+    }
+};
+
+const endQuiz = function () {
+    endScreen.classList.remove('hide');
+    questionsDiv.classList.add('hide');
+    clearInterval(timer);
+    finalScoreSpan.textContent = totalTime > 0 ? totalTime : '0';
+    timeSpan.textContent = totalTime > 0 ? totalTime : '0';
+    if (totalTime <= 0) {
+        timeSpan.textContent = '0';
+        alert('Time is up.');
     }
 };
 
 choicesDiv.addEventListener('click', handleChoice);
 
+// Record score to local storage
 const handleSubmit = function (e) {
-    const initials = document.querySelector('#initials').value;
+    const highScores = JSON.parse(localStorage.getItem('highScores')) || [];
+    const initials = document.querySelector('#initials').value.toUpperCase();
     const record = {
         initials: initials,
         score: totalTime,
     };
     highScores.push(record);
     localStorage.setItem('highScores', JSON.stringify(highScores));
-    document.location.href = 'highscores.html';
+    document.location.href = './highscores.html';
 };
 
 submitBtn.addEventListener('click', handleSubmit);
